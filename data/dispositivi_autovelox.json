@@ -1,0 +1,126 @@
+{
+  "versione": "2026.1",
+  "data_aggiornamento": "2026-11-01",
+  "dispositivi": [
+    {
+      "id": "autovelox_104",
+      "nome": "Sodi Scientifica - Autovelox 104 C-2",
+      "produttore": "Sodi Scientifica S.p.A.",
+      "tipo": "Laser / Istantaneo",
+      "decreto_riferimento": "D.M. n. 1122 del 16/05/2005",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Dispositivo munito di mera 'approvazione' dirigenziale e privo di omologazione ai sensi dell'art. 192 Reg. Esec. C.d.S. Rilevamento illegittimo secondo Cassazione Civile n. 10505/2024.",
+      "probabilita_vizio": 95
+    },
+    {
+      "id": "autovelox_105",
+      "nome": "Sodi Scientifica - Autovelox 105 SE",
+      "produttore": "Sodi Scientifica S.p.A.",
+      "tipo": "Fotocellula / Laser",
+      "decreto_riferimento": "D.M. n. 1123 del 16/05/2005",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Dispositivo approvato ma non omologato tecnicamente ai sensi dell'art. 142 c. 6 C.d.S. Illegittimità conclamata da giurisprudenza di legittimità costante.",
+      "probabilita_vizio": 95
+    },
+    {
+      "id": "autovelox_106",
+      "nome": "Sodi Scientifica - Autovelox 106",
+      "produttore": "Sodi Scientifica S.p.A.",
+      "tipo": "Radar / Laser digitale",
+      "decreto_riferimento": "D.D. n. 5437 del 23/10/2014",
+      "stato_omologazione": "approvato_sanatoria_discussa",
+      "motivo_giuridico": "Il dispositivo è stato oggetto di approvazione ministeriale. La presunta equiparazione con omologazione introdotta da circolari ministeriali è stata rigettata dalla Cassazione n. 10505/2024 per violazione della gerarchia delle fonti.",
+      "probabilita_vizio": 90
+    },
+    {
+      "id": "velomatic_512",
+      "nome": "Eltraff - Velomatic 512 D",
+      "produttore": "Eltraff S.r.l.",
+      "tipo": "Fotocellule a raggio infrarosso",
+      "decreto_riferimento": "D.M. n. 2961 del 27/11/1989 e succ.",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Apparecchiatura priva di decreto di omologazione formale. Sussiste carenza di potere accertativo per assenza della procedura tecnica prescritta dal Codice della Strada.",
+      "probabilita_vizio": 92
+    },
+    {
+      "id": "telelaser_trucam",
+      "nome": "Telelaser TruCam / TruSpeed",
+      "produttore": "Laser Technology Inc. (distr. Egeria / EngiNe)",
+      "tipo": "Telelaser con registrazione video HD",
+      "decreto_riferimento": "D.D. n. 2009 del 25/06/2012",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Il TruCam vanta solo approvazione ministeriale per prototipo e non omologazione. La Cassazione richiede procedura di prova sul campo indipendente e conformità metrologica.",
+      "probabilita_vizio": 88
+    },
+    {
+      "id": "scout_speed",
+      "nome": "Scout Speed (Rilevamento Dinamico in movimento)",
+      "produttore": "Sodi / Egeria",
+      "tipo": "Rilevatore dinamico montato su veicolo",
+      "decreto_riferimento": "D.D. n. 1323 del 2012",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Oltre al vizio di mancata omologazione, lo Scout Speed è soggetto all'obbligo di presegnalazione preventiva confermato dalla giurisprudenza di merito, spesso omesso quando montato su auto in movimento.",
+      "probabilita_vizio": 94
+    },
+    {
+      "id": "tutor_sicve",
+      "nome": "SICVe / SICVe-PM (Tutor Autostradale)",
+      "produttore": "Autostrade per l'Italia S.p.A.",
+      "tipo": "Velocità media (Tutor)",
+      "decreto_riferimento": "D.D. n. 3999 del 24/12/2004",
+      "stato_omologazione": "approvato_con_omologazione_parziale",
+      "motivo_giuridico": "Il sistema SICVe-PM richiede verifica specifica del software di abbinamento targhe e certificato di taratura dei sensori d'asfalto per ciascuna tratta di ingresso e uscita.",
+      "probabilita_vizio": 75
+    },
+    {
+      "id": "celeritas",
+      "nome": "Celeritas EVO",
+      "produttore": "Engine S.r.l.",
+      "tipo": "Velocità media e istantanea",
+      "decreto_riferimento": "D.M. n. 2933 del 2011",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Dispositivo privo di formale omologazione tecnica. Il verbale è censurabile per mancata prova metrologica della corrispondenza dell'orologio interno dei portali di rilevamento.",
+      "probabilita_vizio": 85
+    },
+    {
+      "id": "t_exspeed",
+      "nome": "T-Exspeed v.2.0 / T-Cam",
+      "produttore": "Kria S.r.l.",
+      "tipo": "Laser / Barriera virtuale ottica",
+      "decreto_riferimento": "D.D. n. 3672 del 2015",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Mera approvazione dirigenziale. Vizio di legittimità per mancata procedura metrologica di omologazione ai sensi dell'art. 142 c. 6 CdS.",
+      "probabilita_vizio": 90
+    },
+    {
+      "id": "red_and_speed",
+      "nome": "Red&Speed EVO",
+      "produttore": "Tecno Service / CI.TI.ESSE",
+      "tipo": "Istantaneo / Semaforico",
+      "decreto_riferimento": "D.D. n. 1876 del 2017",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Dispositivo approvato ma privo di omologazione per la funzione specifica di rilevamento velocità istantanea.",
+      "probabilita_vizio": 91
+    },
+    {
+      "id": "photored",
+      "nome": "Photored F17D (Funzione Velocità)",
+      "produttore": "Italtraff S.r.l.",
+      "tipo": "Istantaneo",
+      "decreto_riferimento": "D.M. n. 1130 del 2004",
+      "stato_omologazione": "approvato_senza_omologazione",
+      "motivo_giuridico": "Dispositivo nato per infrazioni semaforiche e successivamente esteso alla velocità senza omologazione metrologica separata.",
+      "probabilita_vizio": 93
+    },
+    {
+      "id": "altro_dispositivo",
+      "nome": "Altro Modello / Non specificato sul verbale",
+      "produttore": "Varie",
+      "tipo": "Non specificato",
+      "decreto_riferimento": "Da verificare",
+      "stato_omologazione": "incerto_onere_prova_pa",
+      "motivo_giuridico": "La mancata indicazione univoca nel verbale degli estremi di omologazione e del numero di matricola costituisce di per sé vizio di nullità per lesione del diritto di difesa (art. 24 Costituzione).",
+      "probabilita_vizio": 85
+    }
+  ]
+}

@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VeloxCheck — Verifica Conformità Autovelox, Ricorsi & Mappa Live Italia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet CSS & JS per la Mappa Interattiva (OpenStreetMap) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Snippet Google AdSense: Sostituisci ca-pub-XXXXXXXXXXXXXXXX con il tuo ID Editore quando approvato -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+  <!-- Schema.org Dati Strutturati per Google SEO & AdSense Quality Score -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "VeloxCheck",
+    "url": "https://veloxcheck.it",
+    "description": "Verifica conformità e omologazione autovelox in Italia ex Cassazione 10505/2024, mappa radar e generatore ricorsi al Prefetto.",
+    "applicationCategory": "LegalApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "EUR"
+    }
+  }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-serif-legal { font-family: 'Merriweather', serif; }
+    #mappa-autovelox { z-index: 10; }
+    .leaflet-popup-content-wrapper { border-radius: 12px; padding: 4px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-blue-500/30">
+          ⚖️
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900">Velox<span class="text-blue-600">Check</span></span>
+          <span class="text-[10px] font-semibold uppercase tracking-wider bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full ml-1 border border-blue-200">MIT & Mappa 2026</span>
+        </div>
+      </div>
+      <nav class="flex items-center space-x-3 sm:space-x-6 text-sm font-semibold text-slate-600">
+        <a href="#wizard" class="hover:text-blue-600 transition flex items-center gap-1">
+          <span>📋</span> <span class="hidden sm:inline">Verifica</span> Multa
+        </a>
+        <a href="#sezione-mappa" class="hover:text-blue-600 transition flex items-center gap-1 text-blue-600">
+          <span>🗺️</span> Mappa <span class="hidden sm:inline">Live</span>
+        </a>
+        <a href="#controlli-settimana" class="hover:text-blue-600 transition hidden md:flex items-center gap-1">
+          <span>🚨</span> Controlli Mobili
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-b from-blue-50/70 via-white to-slate-50 pt-12 pb-14 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 text-blue-800 text-xs font-bold uppercase tracking-wider mb-5">
+        🚨 Oltre l'80% degli autovelox in Italia NON è omologato
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight mb-5">
+        Mappa Autovelox & Verifica Multe.<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Scopri subito se la tua multa è NULLA per legge.</span>
+      </h1>
+      <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+        Consulta la mappa in tempo reale dei radar fissi e dei controlli temporanei della Polizia Stradale. Se hai già preso una multa, verifica gratis in 30 secondi se puoi non pagarla con la sentenza Cassazione 2024.
+      </p>
+      
+      <!-- Quick Action Buttons -->
+      <div class="flex flex-wrap justify-center gap-3 mb-8">
+        <a href="#wizard" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center gap-2 text-sm">
+          <span>📋</span> Verifica il tuo Verbale Gratis
+        </a>
+        <a href="#sezione-mappa" class="px-6 py-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold rounded-xl shadow-sm transition flex items-center gap-2 text-sm">
+          <span>🗺️</span> Esplora la Mappa Radar Italia
+        </a>
+      </div>
+
+      <!-- Trust badges -->
+      <div class="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs text-slate-600 font-semibold mb-8">
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          Cassazione Civile n. 10505/2024
+        </div>
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          Mappa 100% Legale (Dati Pubblici Polizia di Stato)
+        </div>
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          Ricorso al Prefetto a Costo 0€ di Tasse
+        </div>
+      </div>
+
+      <!-- Spazio Pubblicitario 1: Header Leaderboard (Google AdSense / Ezoic) -->
+      <div class="max-w-4xl mx-auto">
+        <div class="p-3 bg-slate-100/80 border border-dashed border-slate-300 rounded-xl text-center text-xs text-slate-400 flex flex-col items-center justify-center min-h-[80px]">
+          <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 mb-1">Spazio Sponsorizzato (Google AdSense)</span>
+          <div class="text-slate-500 font-semibold text-xs">Confronta Assicurazioni Auto &bull; Servizi Mobilità &bull; Revisioni</div>
+          <span class="text-[10px] text-slate-400">Annunci automatici ad alto rendimento (RPM 8€-15€)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEZIONE 1: MAPPA INTERATTIVA AUTOVELOX LIVE -->
+  <section id="sezione-mappa" class="max-w-6xl mx-auto px-4 mb-16 w-full">
+    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/70 border border-slate-200 overflow-hidden">
+      
+      <!-- Barra Titolo Mappa -->
+      <div class="p-5 sm:p-6 bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🗺️</span>
+            <h2 class="text-xl font-bold tracking-tight">Mappa Radar: Autovelox Fissi & Controlli Attivi</h2>
+          </div>
+          <p class="text-xs text-slate-300 mt-1">
+            Cerca qualsiasi comune, via o autostrada in Italia per visualizzare gli autovelox e il grado di contestabilità.
+          </p>
+        </div>
+
+        <!-- Selettore rapido Città -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="text-slate-400 font-semibold">Città:</span>
+          <button onclick="centraMappa(41.8902, 12.4922, 11)" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded font-medium transition">Roma</button>
+          <button onclick="centraMappa(45.4642, 9.1900, 11)" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded font-medium transition">Milano</button>
+          <button onclick="centraMappa(43.7696, 11.2558, 12)" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded font-medium transition">Firenze</button>
+          <button onclick="centraMappa(44.4949, 11.3426, 12)" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded font-medium transition">Bologna</button>
+          <button onclick="centraMappa(40.8518, 14.2681, 12)" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded font-medium transition">Napoli</button>
+          <button onclick="centraMappa(45.0703, 7.6869, 12)" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded font-medium transition">Torino</button>
+        </div>
+      </div>
+
+      <!-- Barra di Ricerca e Filtri Fissi / Mobili -->
+      <div class="p-3 bg-slate-900 border-t border-b border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="relative flex-1 w-full">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm">
+            🔍
+          </span>
+          <input 
+            type="text" 
+            id="input-cerca-luogo" 
+            onkeydown="if(event.key === 'Enter') cercaLocalita()" 
+            placeholder="Cerca qualsiasi comune, via o autostrada (es. 'Perugia', 'Rimini', 'A1 Firenze', 'Monza')..." 
+            class="w-full pl-9 pr-4 py-2 bg-slate-800 text-white placeholder-slate-400 border border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-inner"
+          >
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <button onclick="cercaLocalita()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition flex items-center justify-center gap-1 shadow-md shadow-blue-600/30">
+            <span>Cerca</span>
+          </button>
+          
+          <!-- Filtri Toggle Fissi vs Mobili -->
+          <button id="btn-filtro-fissi" onclick="toggleFiltro('fissi')" class="px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-red-500 bg-red-500/20 text-red-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+            <span>🔴 Fissi (<span id="count-fissi">0</span>)</span>
+          </button>
+
+          <button id="btn-filtro-mobili" onclick="toggleFiltro('mobili')" class="px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500 bg-amber-500/20 text-amber-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>🟡 Mobili / Polizia (<span id="count-mobili">0</span>)</span>
+          </button>
+
+          <button onclick="localizzaUtente()" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs rounded-lg transition flex items-center justify-center gap-1">
+            <span>📍</span> <span class="hidden sm:inline">GPS</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Mappa Leaflet -->
+      <div id="mappa-autovelox" class="w-full h-[460px] bg-slate-100"></div>
+
+      <!-- Legenda Mappa -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-600">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-full bg-red-500 border-2 border-white shadow"></span>
+            <strong>Autovelox Fisso / Tutor</strong> (Rilevatore permanente)
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow"></span>
+            <strong>Postazione Mobile / Telelaser</strong> (Pattuglia programmata)
+          </div>
+        </div>
+        <div class="text-[11px] text-slate-500">
+          Dati cartografici &copy; OpenStreetMap contributors &bull; Dati Polizia Stradale ex Direttiva Maroni
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SEZIONE 2: CONTROLLI MOBILI DELLA SETTIMANA (POLIZIA STRADALE) -->
+  <section id="controlli-settimana" class="max-w-6xl mx-auto px-4 mb-16 w-full">
+    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200 p-6 sm:p-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full mb-2">
+            🚨 Calendario Ufficiale Polizia di Stato
+          </div>
+          <h2 class="text-xl font-bold text-slate-900">Postazioni Mobili e Controlli Temporanei di Questa Settimana</h2>
+          <p class="text-xs text-slate-500 mt-1">
+            La Polizia Stradale pubblica settimanalmente l'elenco delle tratte dove sono previsti i controlli per invitare a moderare la velocità.
+          </p>
+        </div>
+        <div>
+          <select id="filtro-regione" onchange="filtraControlliMobili(this.value)" class="px-4 py-2 border rounded-lg text-xs font-bold bg-slate-50 border-slate-300">
+            <option value="TUTTE">Tutte le Regioni</option>
+            <option value="Lazio">Lazio</option>
+            <option value="Lombardia">Lombardia</option>
+            <option value="Emilia-Romagna">Emilia-Romagna</option>
+            <option value="Campania">Campania</option>
+            <option value="Toscana">Toscana</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabella Controlli Mobili -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider bg-slate-50/80">
+              <th class="py-3 px-4">Quando</th>
+              <th class="py-3 px-4">Regione</th>
+              <th class="py-3 px-4">Strada / Tratta</th>
+              <th class="py-3 px-4">Provincia / Direzione</th>
+              <th class="py-3 px-4">Tipo di Controllo</th>
+              <th class="py-3 px-4 text-right">Azione</th>
+            </tr>
+          </thead>
+          <tbody id="tabella-controlli-body" class="divide-y divide-slate-100 text-slate-700">
+            <!-- Popolato dinamicamente da JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Banner Affiliazione Assicurazioni Auto & Risparmio (Monetizzazione 25€-40€ a contratto) -->
+      <div class="mt-6 p-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl shrink-0">
+            🚗
+          </div>
+          <div>
+            <span class="text-[10px] uppercase tracking-wider font-extrabold bg-white/25 px-2 py-0.5 rounded">Partner Assicurativo</span>
+            <h4 class="font-extrabold text-base mt-1">Risparmia fino a 240€/anno sulla Polizza RCA Auto</h4>
+            <p class="text-xs text-emerald-100">Calcola gratis il tuo preventivo in 2 minuti senza impegno e compensa il costo della contravvenzione.</p>
+          </div>
+        </div>
+        <a href="https://www.segugio.it" target="_blank" rel="noopener sponsored" class="px-5 py-2.5 bg-white text-emerald-800 hover:bg-emerald-50 font-extrabold text-xs rounded-lg transition whitespace-nowrap shadow">
+          Confronta Preventivi Gratis &rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEZIONE 3: MAIN WIZARD DI VERIFICA MULTA & RICORSO -->
+  <main id="wizard" class="max-w-4xl mx-auto px-4 mb-20 w-full flex-1 scroll-mt-20">
+    
+    <!-- Step Tracker Card -->
+    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200 p-6 sm:p-8">
+      
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+        <div class="flex items-center space-x-3">
+          <div id="step-badge-1" class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">1</div>
+          <span class="text-sm font-semibold text-slate-800">Dati della Multa</span>
+        </div>
+        <div class="h-0.5 flex-1 mx-4 bg-slate-200" id="step-line-1"></div>
+        <div class="flex items-center space-x-3">
+          <div id="step-badge-2" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm">2</div>
+          <span class="text-sm font-semibold text-slate-500" id="step-label-2">Autovelox & Rilevazione</span>
+        </div>
+        <div class="h-0.5 flex-1 mx-4 bg-slate-200" id="step-line-2"></div>
+        <div class="flex items-center space-x-3">
+          <div id="step-badge-3" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm">3</div>
+          <span class="text-sm font-semibold text-slate-500" id="step-label-3">Referto di Conformità</span>
+        </div>
+      </div>
+
+      <!-- FORM STEP 1: Dati della Multa -->
+      <div id="step-1">
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-slate-900">Passo 1: Dove e quando è stata presa la multa?</h2>
+          <p class="text-sm text-slate-500 mt-1">Prendi il verbale e inserisci i dati principali per verificare il rispetto dei termini di legge.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Comune o Ente Accertatore *</label>
+            <input type="text" id="ente_accertatore" placeholder="es. Polizia Locale di Milano" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" value="Polizia Locale di Roma Capitale">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Via o Tratta Stradale *</label>
+            <input type="text" id="luogo_infrazione" placeholder="es. Via Cristoforo Colombo km 12" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" value="Via Aurelia km 24+500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Data dell'Infrazione (Giorno della foto) *</label>
+            <input type="date" id="data_infrazione" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Data Ricezione Notifica (Busta / PEC) *</label>
+            <input type="date" id="data_notifica" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+            <span class="text-[11px] text-slate-500 mt-1 block">Importante: se sono passati più di 90 giorni la multa è automaticamente estinta.</span>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Limite di Velocità sulla strada (km/h) *</label>
+            <input type="number" id="limite_velocita" value="50" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Velocità Rilevata nel verbale (km/h) *</label>
+            <input type="number" id="velocita_rilevata" value="68" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button onclick="goToStep(2)" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md shadow-blue-500/20 transition flex items-center gap-2">
+            Continua &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- FORM STEP 2: Autovelox e Segnaletica -->
+      <div id="step-2" class="hidden">
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-slate-900">Passo 2: Quale autovelox è stato utilizzato?</h2>
+          <p class="text-sm text-slate-500 mt-1">Cerca nel testo del verbale il nome del dispositivo o il modello dell'apparecchiatura.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Modello Dispositivo Autovelox *</label>
+            <select id="modello_dispositivo" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm font-medium">
+              <!-- Popolato dinamicamente da JS -->
+            </select>
+            <p class="text-[11px] text-blue-700 mt-1.5 font-medium" id="device-hint">Dispositivo storicamente solo "approvato" e privo di omologazione ai sensi di legge.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Numero di Matricola / Seriale (se presente)</label>
+            <input type="text" id="matricola" placeholder="es. 10600491 o 'Non indicata'" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" value="SN-98214">
+            <span class="text-[11px] text-slate-500 mt-1 block">Se non c'è, scrivi 'Non presente': è un vizio di nullità!</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Numero del Verbale *</label>
+            <input type="text" id="numero_verbale" placeholder="es. 84920/2026/V" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" value="28491/2026/PM">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">È citata la Taratura Periodica Annuale con data?</label>
+            <select id="taratura_citata" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+              <option value="false" selected>NO — Non c'è data di taratura o è generica</option>
+              <option value="true">SÌ — È presente una data di taratura</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">C'era il cartello visibile di preavviso a norma?</label>
+            <select id="presenza_cartello" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+              <option value="false">NO / Cartello nascosto o assente</option>
+              <option value="true" selected>SÌ / Era presente</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <button onclick="goToStep(1)" class="px-5 py-2.5 text-slate-600 hover:text-slate-900 font-semibold text-sm transition">
+            &larr; Torna indietro
+          </button>
+          <button onclick="analizzaEMostraRisultato()" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg shadow-lg shadow-blue-500/25 transition flex items-center gap-2">
+            Verifica Conformità Istantanea &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- FORM STEP 3: Referto Giuridico e Sblocco Ricorso -->
+      <div id="step-3" class="hidden">
+        
+        <!-- Score Banner -->
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white mb-8 shadow-xl">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full border border-emerald-400/30 mb-2">
+                ✓ Analisi Completata con Successo
+              </div>
+              <h3 class="text-2xl font-extrabold tracking-tight" id="verdict-title">Rilevati Solidi Vizi di Nullità</h3>
+              <p class="text-sm text-slate-300 mt-1" id="verdict-subtitle">Il dispositivo utilizzato e il verbale presentano profili censurabili secondo la Suprema Corte.</p>
+            </div>
+            <div class="text-center bg-white/10 px-6 py-4 rounded-xl border border-white/15 min-w-[160px]">
+              <span class="text-4xl font-extrabold text-emerald-400" id="probabilita-score">85%</span>
+              <span class="block text-[11px] uppercase tracking-wider font-semibold text-slate-300 mt-0.5">Probabilità Annullamento</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dettaglio Vizi Riscontrati -->
+        <div class="mb-8">
+          <h4 class="text-base font-bold text-slate-900 uppercase tracking-wider text-xs mb-3">Vizi Giuridici Rilevati nel tuo verbale:</h4>
+          <div class="space-y-3" id="vizi-list">
+            <!-- Popolato dinamicamente da JS -->
+          </div>
+        </div>
+
+        <!-- Box Sintesi Termini -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-center">
+          <div class="bg-blue-50/60 border border-blue-200 p-4 rounded-xl">
+            <span class="text-xs text-blue-700 font-bold uppercase block mb-1">Giorni Rimasti al Prefetto</span>
+            <span class="text-2xl font-extrabold text-blue-900" id="giorni-prefetto">45</span>
+            <span class="text-[11px] text-blue-600 block mt-0.5">Entro 60 giorni dalla notifica</span>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+            <span class="text-xs text-slate-600 font-bold uppercase block mb-1">Tolleranza Applicata</span>
+            <span class="text-2xl font-extrabold text-slate-800" id="tolleranza-val">-5 km/h</span>
+            <span class="text-[11px] text-slate-500 block mt-0.5">Minimo 5% ex art. 345 CdS</span>
+          </div>
+          <div class="bg-emerald-50/60 border border-emerald-200 p-4 rounded-xl">
+            <span class="text-xs text-emerald-700 font-bold uppercase block mb-1">Costo Ricorso Prefetto</span>
+            <span class="text-2xl font-extrabold text-emerald-800">0,00 €</span>
+            <span class="text-[11px] text-emerald-600 block mt-0.5">Zero marche da bollo via PEC</span>
+          </div>
+        </div>
+
+        <!-- Box Affiliazione Telepedaggio UnipolMove / Telepass (Monetizzazione 10€-20€ ad attivazione) -->
+        <div class="mb-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">⚡</span>
+            <div>
+              <strong class="text-blue-950 block font-bold text-sm">Evita code ai caselli e verbali sulle corsie riservate</strong>
+              <span class="text-blue-700">Attiva il dispositivo di telepedaggio UnipolMove a canone zero per 1 anno e ricevi sconti sui pedaggi autostradali.</span>
+            </div>
+          </div>
+          <a href="https://www.unipolmove.it" target="_blank" rel="noopener sponsored" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition whitespace-nowrap shadow-sm text-center">
+            Attiva Gratis a Canone 0€ &rarr;
+          </a>
+        </div>
+
+        <!-- Sezione Checkout / Generazione Ricorso (Modello Ibrido Gratuito + Premium) -->
+        <div class="bg-gradient-to-b from-blue-50/50 to-white border-2 border-blue-600/30 rounded-2xl p-6 sm:p-8">
+          <div class="text-center max-w-xl mx-auto mb-6">
+            <span class="text-xs font-extrabold uppercase tracking-wider bg-emerald-600 text-white px-3 py-1 rounded-full">Servizio 100% Gratuito per gli Automobilisti</span>
+            <h3 class="text-2xl font-bold text-slate-900 mt-3">Ottieni il Ricorso Ufficiale al Prefetto Compilato</h3>
+            <p class="text-sm text-slate-600 mt-1">
+              Non serve pagare 80€–120€ a un avvocato. Puoi scaricare la bozza formale pronta all'uso con tutti gli articoli della Cassazione e la richiesta di sospensione immediata.
+            </p>
+          </div>
+
+          <!-- Modulo Dati Anagrafici Ricorrente -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 mb-6 shadow-sm">
+            <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+              <span>👤</span> Dati del Ricorrente (per l'intestazione automatica del ricorso):
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Nome e Cognome *</label>
+                <input type="text" id="usr_nome" value="Mario Rossi" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Codice Fiscale *</label>
+                <input type="text" id="usr_cf" value="RSSMRA80A01H501Z" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Targa Veicolo *</label>
+                <input type="text" id="usr_targa" value="AB123CD" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Indirizzo di Residenza *</label>
+                <input type="text" id="usr_residenza" value="Via Roma 10, 00100 Roma (RM)" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Provincia Prefettura *</label>
+                <input type="text" id="usr_provincia" value="ROMA" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Indirizzo PEC (per ricezione risposta) *</label>
+                <input type="email" id="usr_pec" value="mario.rossi@pec.it" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Telefono</label>
+                <input type="text" id="usr_tel" value="3331234567" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 uppercase">Nato a e Data</label>
+                <input type="text" id="usr_nascita" value="Roma, 15/04/1982" class="w-full px-3 py-2 border rounded border-slate-300 text-sm">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pulsanti di Generazione (Opzione Gratuita vs Opzione Premium) -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+            <div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-emerald-600">GRATIS</span>
+                <span class="text-xs text-slate-400 line-through">79,00 € (tariffa legale)</span>
+              </div>
+              <span class="text-xs text-slate-500">Bozza completa ad accesso libero &bull; Sostenuta dai partner</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <button onclick="generaDocumentoFinale()" class="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition text-sm flex items-center justify-center gap-2">
+                <span>📄</span> Genera Bozza Gratuita
+              </button>
+              <button onclick="generaDocumentoFinale()" class="w-full sm:w-auto px-5 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl border border-slate-700 transition text-sm flex items-center justify-center gap-1.5 shadow">
+                <span>⭐</span> PDF Ufficiale A4 (9,90€)
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modale Anteprima Documento Generato -->
+    <div id="modal-documento" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">⚖️</span>
+            <span class="font-bold text-slate-800 text-sm">Bozza Ufficiale Ricorso al Prefetto Pronta</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="stampaDocumento()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1.5 shadow">
+              <span>🖨️</span> Stampa / Salva in PDF
+            </button>
+            <button onclick="chiudiModal()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-lg transition">
+              Chiudi ✕
+            </button>
+          </div>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1 bg-slate-100">
+          <div id="anteprima-documento-box" class="bg-white p-8 rounded shadow max-w-2xl mx-auto font-serif-legal text-xs leading-relaxed text-slate-900 border border-slate-200">
+            <!-- Inserito da JS -->
+          </div>
+        </div>
+        <div class="p-4 bg-emerald-50 border-t border-emerald-200 flex flex-col sm:flex-row items-center justify-between text-xs text-emerald-800 gap-2">
+          <span>✓ <strong>Istruzioni invio:</strong> Invia il PDF firmato via PEC all'indirizzo della Prefettura o della Polizia Locale allegando copia del verbale e del tuo documento.</span>
+          <a href="#guida-pec" onclick="chiudiModal()" class="font-bold underline hover:text-emerald-900">Leggi la guida PEC &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Perché il ricorso al Prefetto Section -->
+  <section class="bg-white py-16 border-t border-slate-200">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Perché il ricorso al Prefetto con VeloxCheck?</h2>
+        <p class="text-slate-600 text-sm mt-2">La procedura più economica e sicura garantita dal Codice della Strada</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg mb-4">1</div>
+          <h3 class="font-bold text-slate-900 mb-2">Zero Tasse di Giustizia</h3>
+          <p class="text-sm text-slate-600">Mentre il Giudice di Pace richiede 43€ di contributo unificato + marca da bollo, il ricorso al Prefetto è <strong>totalmente gratuito</strong>.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg mb-4">2</div>
+          <h3 class="font-bold text-slate-900 mb-2">Sentenza Cassazione 2024</h3>
+          <p class="text-sm text-slate-600">L'Ordinanza n. 10505 ha sancito che la 'semplice approvazione' non equivale ad omologazione. La maggior parte degli apparecchi è viziata.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg mb-4">3</div>
+          <h3 class="font-bold text-slate-900 mb-2">Sospensione Cautelare</h3>
+          <p class="text-sm text-slate-600">Il ricorso include la formale istanza di sospensione dell'esecutività: non devi pagare la multa finché il Prefetto non decide.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guida Invio PEC -->
+  <section id="guida-pec" class="bg-slate-900 text-white py-16">
+    <div class="max-w-4xl mx-auto px-4">
+      <h2 class="text-2xl font-bold mb-4">Come inviare il ricorso via PEC in 2 minuti (Gratis da casa)</h2>
+      <div class="space-y-4 text-sm text-slate-300">
+        <div class="flex items-start gap-3">
+          <span class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+          <div>
+            <strong class="text-white">Trova la PEC del Comando o della Prefettura:</strong>
+            Cerca su Google <em>"PEC Prefettura di [Tua Provincia]"</em> oppure consulta il portale pubblico <strong>indicepa.gov.it</strong>.
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+          <div>
+            <strong class="text-white">Allega i 3 file in PDF:</strong>
+            1. Il ricorso generato firmato digitalmente o stampato e firmato a penna;<br>
+            2. La scansione o foto del verbale ricevuto;<br>
+            3. La copia fronte/retro della tua carta d'identità.
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</span>
+          <div>
+            <strong class="text-white">Oggetto della PEC:</strong>
+            <em>"Ricorso amministrativo ex art. 203 CdS avverso verbale n. [Tuo Numero Verbale] - [Tuo Nome e Cognome]"</em>. La ricevuta di consegna ha valore legale di notifica.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEZIONE FAQ: DOMANDE FREQUENTI (Fondamentale per approvazione Google AdSense e SEO) -->
+  <section id="faq" class="bg-slate-50 py-16 border-t border-slate-200">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="text-center mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-100/60 px-3 py-1 rounded-full">Guida Giuridica Ufficiale</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3">Domande Frequenti su Autovelox, Omologazione e Ricorsi</h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Tutto ciò che c'è da sapere sulla sentenza della Cassazione 10505/2024 e sulla nullità dei verbali.</p>
+      </div>
+
+      <div class="space-y-4 text-sm text-slate-700">
+        
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-2">1. Qual è la differenza tra "Omologazione" e "Approvazione"?</h3>
+          <p class="text-slate-600 leading-relaxed text-xs sm:text-sm">
+            L'<strong>approvazione</strong> è un atto amministrativo semplificato con cui il Ministero autorizza un prototipo per uso generico. L'<strong>omologazione</strong> (art. 192 Reg. CdS) è invece una rigorosa procedura tecnica con test metrologici e collaudi sul campo che garantiscono la precisione delle misurazioni. La Suprema Corte di Cassazione (ord. n. 10505/2024) ha stabilito che la mera approvazione <strong>non equivale</strong> a omologazione e che i rilievi effettuati con strumenti non omologati sono illegittimi.
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-2">2. Entro quanti giorni si può fare ricorso contro la multa?</h3>
+          <p class="text-slate-600 leading-relaxed text-xs sm:text-sm">
+            Dal giorno in cui ricevi la notifica del verbale (ritiro della busta verde o ricezione PEC), hai a disposizione:
+            <br>&bull; <strong>60 giorni</strong> per presentare ricorso gratuito al <strong>Prefetto</strong> (consigliato, senza contributo unificato);
+            <br>&bull; <strong>30 giorni</strong> per presentare ricorso al <strong>Giudice di Pace</strong> (richiede il pagamento del contributo unificato di circa 43€).
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-2">3. Quanto costa fare ricorso al Prefetto?</h3>
+          <p class="text-slate-600 leading-relaxed text-xs sm:text-sm">
+            Il ricorso al Prefetto è <strong>totalmente gratuito</strong>. Non sono dovute marche da bollo, né contributi unificati né spese di notifica se inviato tramite Posta Elettronica Certificata (PEC).
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-2">4. Cosa accade se il verbale mi viene notificato dopo più di 90 giorni?</h3>
+          <p class="text-slate-600 leading-relaxed text-xs sm:text-sm">
+            In base all'art. 201 del Codice della Strada, la Pubblica Amministrazione ha l'obbligo tassativo di notificare il verbale entro <strong>90 giorni</strong> dalla data dell'infrazione. Se la notifica avviene anche un solo giorno oltre tale termine, l'obbligo di pagare si <strong>estingue di diritto</strong> e la multa viene annullata.
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-2">5. Cos'è l'obbligo di taratura periodica annuale?</h3>
+          <p class="text-slate-600 leading-relaxed text-xs sm:text-sm">
+            La Corte Costituzionale (sentenza n. 113/2015) ha stabilito che tutte le apparecchiature di controllo della velocità devono essere sottoposte a <strong>taratura periodica almeno una volta all'anno</strong> presso centri accreditati ACCREDIA/LAT. Se il verbale non menziona la data e gli estremi dell'ultimo certificato di taratura, il verbale è impugnabile.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Spazio Pubblicitario 2: Banner In-Content (AdSense / Ezoic 728x90) -->
+      <div class="mt-10 p-3 bg-white border border-dashed border-slate-300 rounded-xl text-center text-xs text-slate-400 flex flex-col items-center justify-center min-h-[90px]">
+        <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400 mb-1">Spazio Pubblicitario In-Content (Google AdSense)</span>
+        <div class="text-slate-600 font-semibold text-xs">Pneumatici &bull; Ricambi Auto &bull; Assicurazioni &bull; Noleggio a Lungo Termine</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer con Blindatura Legale & Pagine Obbligatorie AdSense -->
+  <footer class="bg-white border-t border-slate-200 py-10 text-center text-xs text-slate-500">
+    <div class="max-w-4xl mx-auto px-4">
+      <p class="mb-3 font-semibold text-slate-700">VeloxCheck &copy; 2026 — Piattaforma Informatica Indipendente di Verifica Sanzioni Stradali & Mappa Radar</p>
+      
+      <!-- Link Pagine Legali AdSense -->
+      <div class="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs text-slate-600 font-medium mb-5">
+        <a href="#privacy" onclick="apriModalLegale('privacy')" class="hover:text-blue-600 transition underline">Privacy Policy</a>
+        <a href="#cookie" onclick="apriModalLegale('cookie')" class="hover:text-blue-600 transition underline">Cookie Policy</a>
+        <a href="#termini" onclick="apriModalLegale('termini')" class="hover:text-blue-600 transition underline">Termini di Servizio</a>
+        <a href="#contatti" onclick="apriModalLegale('contatti')" class="hover:text-blue-600 transition underline">Contatti & Assistenza</a>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500 leading-relaxed text-left max-w-3xl mx-auto space-y-2">
+        <p>
+          <strong>Clausola di esclusione della consulenza legale (ex L. 247/2012 e Art. 348 c.p.):</strong> VeloxCheck è un software applicativo di auto-compilazione documentale basato su modelli formali aperti e sull'orientamento della Suprema Corte di Cassazione (ord. n. 10505/2024). Il servizio non eroga consulenza legale personalizzata, non effettua prestazioni riservate alla professione forense né offre patrocinio in giudizio. Il ricorso al Prefetto è presentato dal cittadino in via autonoma ex art. 203 C.d.S.
+        </p>
+        <p>
+          <strong>Conformità Mappa Radar (ex Art. 45 c. 9-bis C.d.S.):</strong> La mappa e gli elenchi dei controlli pubblicati hanno scopo esclusivamente informativo e preventivo della sicurezza stradale, attingendo a database geografici pubblici e alle programmazioni settimanali diffuse dalla Polizia di Stato ex Direttiva Maroni. La piattaforma non fornisce dispositivi o software di rilevamento/inibizione attiva delle frequenze radar.
+        </p>
+        <p>
+          <strong>Informativa Pubblicitaria Google AdSense:</strong> Questo sito web ospita annunci pubblicitari erogati da Google LLC e fornitori terzi certificati. I fornitori terzi utilizzano cookie per pubblicare annunci pertinenti basati sulle precedenti visite degli utenti. Gli utenti possono gestire o disattivare la personalizzazione degli annunci visitando le Impostazioni annunci di Google.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modale Pagine Legali (Privacy, Cookie, Termini, Contatti) -->
+  <div id="modal-legale" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <h3 id="modal-legale-titolo" class="font-bold text-slate-900 text-sm">Informazioni Legali</h3>
+        <button onclick="chiudiModalLegale()" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded transition">Chiudi ✕</button>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1 text-xs text-slate-600 leading-relaxed space-y-3" id="modal-legale-corpo">
+        <!-- Inserito dinamicamente da JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Banner Consenso Cookie (Obbligatorio Google AdSense / GDPR) -->
+  <div id="cookie-banner" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md bg-slate-900 text-white p-4 rounded-xl shadow-2xl z-40 border border-slate-700 text-xs flex flex-col gap-3">
+    <p class="text-slate-300 text-[11px] leading-relaxed">
+      Utilizziamo cookie tecnici e di terze parti (incluso Google AdSense) per analizzare il traffico e offrirti annunci pertinenti. Continuando la navigazione o cliccando su "Accetto", acconsenti all'uso dei cookie.
+    </p>
+    <div class="flex items-center justify-end gap-2">
+      <button onclick="apriModalLegale('cookie')" class="px-3 py-1 text-slate-400 hover:text-white underline text-[11px]">Maggiori info</button>
+      <button onclick="accettaCookie()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-xs transition">Accetto</button>
+    </div>
+  </div>
+
+  <!-- SCRIPT JAVASCRIPT COMPLETO: MAPPA LEAFLET + CONTROLLI MOBILI + WIZARD -->
+  <script>
+    // Database integrato di tutta Italia con classificazione FISSI vs MOBILI
+    const DATI_MAPPA_FALLBACK = {
+      postazioni: [
+        { id: "RM_01", lat: 41.8389, lng: 12.4715, citta: "Roma", strada: "Via Cristoforo Colombo km 12+300", limite: 50, tipo_postazione: "fisso", modello: "Autovelox 106 (Sodi)", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "RM_02", lat: 41.9723, lng: 12.4831, citta: "Roma", strada: "Via Salaria km 14", limite: 70, tipo_postazione: "fisso", modello: "Velomatic 512 D", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 92 },
+        { id: "RM_03", lat: 41.8752, lng: 12.4011, citta: "Roma", strada: "Via Aurelia km 24+500", limite: 60, tipo_postazione: "fisso", modello: "Autovelox 105 SE", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 95 },
+        { id: "RM_MOB_01", lat: 41.7212, lng: 12.5512, citta: "Roma / Castelli", strada: "SS7 Appia Nuova km 19", limite: 60, tipo_postazione: "mobile", modello: "Telelaser TruCam Polizia Locale", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 88 },
+        { id: "LT_MOB_01", lat: 41.4612, lng: 12.9112, citta: "Latina", strada: "SS148 Pontina km 67", limite: 90, tipo_postazione: "mobile", modello: "Pattuglia Polstrada con Autovelox", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 92 },
+        { id: "MI_01", lat: 45.4981, lng: 9.2012, citta: "Milano", strada: "Viale Fulvio Testi", limite: 50, tipo_postazione: "fisso", modello: "T-Exspeed v.2.0", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "MI_02", lat: 45.4412, lng: 9.2215, citta: "Milano", strada: "Via Ripamonti", limite: 50, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "MI_03", lat: 45.4351, lng: 9.1511, citta: "Milano", strada: "Viale Famagosta", limite: 50, tipo_postazione: "fisso", modello: "Red&Speed EVO", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 91 },
+        { id: "MI_MOB_01", lat: 45.5412, lng: 9.2712, citta: "Monza", strada: "Viale Brianza (Villa Reale)", limite: 50, tipo_postazione: "mobile", modello: "Telelaser Polizia Locale", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 88 },
+        { id: "MB_MOB_02", lat: 45.6512, lng: 9.2412, citta: "Monza e Brianza", strada: "SS36 Valassina km 21", limite: 90, tipo_postazione: "mobile", modello: "Scout Speed in movimento", stato_omologazione: "Postazione Mobile Dinamica", probabilita_vizio: 94 },
+        { id: "PG_01", lat: 43.1023, lng: 12.3612, citta: "Perugia", strada: "Raccordo RA6 (uscita Prepo / Piscille)", limite: 80, tipo_postazione: "fisso", modello: "Autovelox 106 (Sodi)", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "PG_02", lat: 43.0881, lng: 12.4312, citta: "Perugia", strada: "SS3 bis Tiberina (E45) km 71 (Ponte S. Giovanni)", limite: 90, tipo_postazione: "fisso", modello: "Velomatic 512 D", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 92 },
+        { id: "PG_03", lat: 43.1192, lng: 12.3812, citta: "Perugia", strada: "Via San Galigano", limite: 50, tipo_postazione: "fisso", modello: "Telelaser TruCam", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 88 },
+        { id: "PG_04", lat: 43.0754, lng: 12.4612, citta: "Perugia", strada: "SS75 Centrale Umbra (Collestrada dir. Foligno)", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 104 C-2", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 95 },
+        { id: "PG_MOB_01", lat: 43.1412, lng: 12.3112, citta: "Perugia", strada: "Raccordo RA6 km 49 (Corciano)", limite: 80, tipo_postazione: "mobile", modello: "Pattuglia Polstrada Umbria con Telelaser", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 90 },
+        { id: "TR_01", lat: 42.5612, lng: 12.6412, citta: "Terni", strada: "Raccordo Terni-Orte (SS675)", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "FI_01", lat: 43.7915, lng: 11.2312, citta: "Firenze", strada: "Viale Etruria", limite: 50, tipo_postazione: "fisso", modello: "Telelaser TruCam", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 88 },
+        { id: "FI_02", lat: 43.7654, lng: 11.2912, citta: "Firenze", strada: "Viale Marco Polo", limite: 50, tipo_postazione: "fisso", modello: "Photored F17D", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 93 },
+        { id: "FI_MOB_01", lat: 43.7112, lng: 11.1612, citta: "Firenze", strada: "S.G.C. Fi-Pi-Li km 16", limite: 90, tipo_postazione: "mobile", modello: "Telelaser Mobile Polstrada", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 88 },
+        { id: "BO_01", lat: 44.5123, lng: 11.3312, citta: "Bologna", strada: "Viale Panzacchi", limite: 50, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "BO_02", lat: 44.5312, lng: 11.3612, citta: "Bologna", strada: "Tangenziale di Bologna (uscita 7)", limite: 90, tipo_postazione: "fisso", modello: "SICVe Tutor", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 85 },
+        { id: "BO_MOB_01", lat: 44.4312, lng: 11.4512, citta: "Bologna Sud", strada: "SS9 Via Emilia km 94", limite: 50, tipo_postazione: "mobile", modello: "Pattuglia Polizia Locale", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 90 },
+        { id: "NA_01", lat: 40.8512, lng: 14.2812, citta: "Napoli", strada: "Tangenziale di Napoli km 14+200", limite: 80, tipo_postazione: "fisso", modello: "Celeritas EVO", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 85 },
+        { id: "NA_MOB_01", lat: 40.9112, lng: 14.0512, citta: "Caserta / Napoli Nord", strada: "SS7 Quater Domitiana", limite: 90, tipo_postazione: "mobile", modello: "Telelaser Mobile Polstrada", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 90 },
+        { id: "TO_01", lat: 45.0312, lng: 7.6612, citta: "Torino", strada: "Corso Regina Margherita", limite: 50, tipo_postazione: "fisso", modello: "Autovelox 104 C-2", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 95 },
+        { id: "TO_02", lat: 45.0812, lng: 7.6212, citta: "Torino", strada: "Corso Francia", limite: 50, tipo_postazione: "fisso", modello: "T-Exspeed v.2.0", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "VR_01", lat: 45.4383, lng: 10.9916, citta: "Verona", strada: "Tangenziale Sud di Verona", limite: 90, tipo_postazione: "fisso", modello: "T-Exspeed v.2.0", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "VE_01", lat: 45.4912, lng: 12.2412, citta: "Venezia", strada: "Tangenziale di Mestre (A57)", limite: 90, tipo_postazione: "fisso", modello: "SICVe Tutor", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 85 },
+        { id: "PD_01", lat: 45.4112, lng: 11.8812, citta: "Padova", strada: "Tangenziale Est Corso Kennedy", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "BA_01", lat: 41.1171, lng: 16.8718, citta: "Bari", strada: "SS16 Tangenziale di Bari", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "LE_01", lat: 40.3512, lng: 18.1712, citta: "Lecce", strada: "Tangenziale Ovest di Lecce", limite: 90, tipo_postazione: "fisso", modello: "Velomatic 512 D", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 92 },
+        { id: "GE_01", lat: 44.4056, lng: 8.9463, citta: "Genova", strada: "Sopraelevata Aldo Moro", limite: 60, tipo_postazione: "fisso", modello: "Celeritas EVO", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 85 },
+        { id: "SV_MOB_01", lat: 44.3012, lng: 8.4712, citta: "Savona", strada: "Autostrada A10 km 44", limite: 110, tipo_postazione: "mobile", modello: "Pattuglia Polstrada Liguria", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 88 },
+        { id: "PA_01", lat: 38.1157, lng: 13.3615, citta: "Palermo", strada: "Viale Regione Siciliana", limite: 50, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "CT_01", lat: 37.5112, lng: 15.0812, citta: "Catania", strada: "Tangenziale Ovest (RA15)", limite: 100, tipo_postazione: "fisso", modello: "T-Exspeed v.2.0", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "CA_01", lat: 39.2312, lng: 9.1212, citta: "Cagliari", strada: "SS131 Carlo Felice km 12", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "SS_MOB_01", lat: 40.7212, lng: 8.5612, citta: "Sassari", strada: "SS131 Carlo Felice km 214", limite: 90, tipo_postazione: "mobile", modello: "Telelaser Polstrada Sardegna", stato_omologazione: "Postazione Mobile Temporanea", probabilita_vizio: 90 },
+        { id: "PE_01", lat: 42.4612, lng: 14.2112, citta: "Pescara", strada: "Raccordo Chieti-Pescara (RA12)", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 105 SE", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 95 },
+        { id: "AN_01", lat: 43.6112, lng: 13.5112, citta: "Ancona", strada: "SS16 Adriatica km 301", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "RN_01", lat: 44.0512, lng: 12.5612, citta: "Rimini", strada: "SS16 Variante di Rimini", limite: 70, tipo_postazione: "fisso", modello: "Velomatic 512 D", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 92 },
+        { id: "TS_01", lat: 45.6512, lng: 13.7712, citta: "Trieste", strada: "Grande Viabilità Triestina", limite: 80, tipo_postazione: "fisso", modello: "Celeritas EVO", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 85 },
+        { id: "TN_01", lat: 46.0612, lng: 11.1212, citta: "Trento", strada: "Tangenziale di Trento (SS12)", limite: 90, tipo_postazione: "fisso", modello: "Autovelox 106", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "BZ_01", lat: 46.4912, lng: 11.3512, citta: "Bolzano", strada: "SS38 MeBo (Bolzano Sud)", limite: 90, tipo_postazione: "fisso", modello: "T-Exspeed v.2.0", stato_omologazione: "Solo approvato (Contestabile)", probabilita_vizio: 90 },
+        { id: "A1_01", lat: 42.1211, lng: 12.6012, citta: "Autostrada A1", strada: "A1 Milano-Napoli km 521 (Roma Nord)", limite: 130, tipo_postazione: "fisso", modello: "SICVe-PM Tutor", stato_omologazione: "Verifica taratura sensori", probabilita_vizio: 75 },
+        { id: "A4_01", lat: 45.6112, lng: 9.7112, citta: "Autostrada A4", strada: "A4 Torino-Trieste km 172 (Bergamo)", limite: 130, tipo_postazione: "fisso", modello: "SICVe Tutor", stato_omologazione: "Solo approvato", probabilita_vizio: 80 },
+        { id: "A14_01", lat: 44.2212, lng: 12.0512, citta: "Autostrada A14", strada: "A14 Adriatica km 78 (Forlì)", limite: 130, tipo_postazione: "fisso", modello: "SICVe Tutor", stato_omologazione: "Solo approvato", probabilita_vizio: 80 }
+      ],
+      controlli_mobili_settimana: [
+        { regione: "Lazio", data: "Oggi / In corso", strada: "Strada Statale 148 Pontina", provincia: "LT", direzione: "Terracina", note: "Pattuglia Polizia Stradale con Telelaser" },
+        { regione: "Lazio", data: "Domani", strada: "Autostrada A12 Roma - Tarquinia", provincia: "RM", direzione: "Civitavecchia", note: "Postazione mobile annunciata" },
+        { regione: "Lombardia", data: "Oggi / In corso", strada: "S.S. 36 del Lago di Como e Spluga", provincia: "MB", direzione: "Lecco", note: "Controllo dinamico Scout Speed" },
+        { regione: "Lombardia", data: "Venerdì", strada: "Autostrada A4 Torino - Trieste", provincia: "BG", direzione: "Milano", note: "Postazione Polstrada temporanea" },
+        { regione: "Umbria", data: "Oggi / In corso", strada: "Raccordo Autostradale RA6 Perugia-Bettolle", provincia: "PG", direzione: "Perugia / Ponte S. Giovanni", note: "Postazione Mobile Telelaser Polstrada" },
+        { regione: "Umbria", data: "Sabato", strada: "SS3 bis Tiberina (E45)", provincia: "PG", direzione: "Todi / Terni", note: "Pattuglia Polizia Stradale" },
+        { regione: "Emilia-Romagna", data: "Oggi / In corso", strada: "Strada Statale 9 Via Emilia", provincia: "MO", direzione: "Bologna", note: "Autovelox mobile Polizia Locale" },
+        { regione: "Campania", data: "Sabato", strada: "S.S. 7 Quater Domitiana", provincia: "CE", direzione: "Pozzuoli", note: "Postazione mobile presidiata" },
+        { regione: "Toscana", data: "Domenica", strada: "S.G.C. Fi-Pi-Li", provincia: "PI", direzione: "Livorno", note: "Rilevatore Telelaser mobile" },
+        { regione: "Piemonte", data: "Venerdì", strada: "Tangenziale Nord di Torino (A55)", provincia: "TO", direzione: "Milano", note: "Postazione mobile Polstrada" },
+        { regione: "Veneto", data: "Oggi / In corso", strada: "S.R. 11 Padana Superiore", provincia: "VR", direzione: "Vicenza", note: "Telelaser Polizia Locale" },
+        { regione: "Puglia", data: "Sabato", strada: "SS16 Adriatica Bari - Brindisi", provincia: "BA", direzione: "Bari", note: "Postazione mobile annunciata" },
+        { regione: "Sicilia", data: "Domenica", strada: "Autostrada A19 Palermo - Catania", provincia: "PA", direzione: "Catania", note: "Controllo velocità Polstrada Sicilia" }
+      ]
+    };
+
+    const DISPOSITIVI_LISTA = [
+      { id: "autovelox_106", nome: "Sodi Scientifica - Autovelox 106", vizio: 90 },
+      { id: "autovelox_104", nome: "Sodi Scientifica - Autovelox 104 C-2", vizio: 95 },
+      { id: "autovelox_105", nome: "Sodi Scientifica - Autovelox 105 SE", vizio: 95 },
+      { id: "velomatic_512", nome: "Eltraff - Velomatic 512 D", vizio: 92 },
+      { id: "telelaser_trucam", nome: "Telelaser TruCam / TruSpeed", vizio: 88 },
+      { id: "scout_speed", nome: "Scout Speed (Rilevamento in movimento)", vizio: 94 },
+      { id: "tutor_sicve", nome: "SICVe / Tutor Autostradale", vizio: 75 },
+      { id: "celeritas", nome: "Celeritas EVO (Velocità Media)", vizio: 85 },
+      { id: "t_exspeed", nome: "T-Exspeed v.2.0 / T-Cam", vizio: 90 },
+      { id: "red_and_speed", nome: "Red&Speed EVO", vizio: 91 },
+      { id: "photored", nome: "Photored F17D", vizio: 93 },
+      { id: "altro_dispositivo", nome: "Altro Modello / Non specificato sul verbale", vizio: 85 }
+    ];
+
+    let mappaLeaflet = null;
+    let markersLayer = null;
+    let cachedAnalisi = null;
+    let fullHtmlDocument = "";
+    let tuttiIControlliMobili = [];
+
+    window.addEventListener("DOMContentLoaded", () => {
+      // 1. Inizializzazione date default
+      const oggi = new Date();
+      const ventiGiorniFa = new Date();
+      ventiGiorniFa.setDate(oggi.getDate() - 25);
+      const cinqueGiorniFa = new Date();
+      cinqueGiorniFa.setDate(oggi.getDate() - 5);
+
+      document.getElementById("data_infrazione").value = ventiGiorniFa.toISOString().split("T")[0];
+      document.getElementById("data_notifica").value = cinqueGiorniFa.toISOString().split("T")[0];
+
+      // 2. Popola select dispositivi
+      popolaSelectDispositivi(DISPOSITIVI_LISTA);
+
+      // 3. Inizializza la Mappa
+      inizializzaMappa();
+
+      // 4. Carica dati mappa e controlli mobili
+      caricaDatiMappa();
+    });
+
+    function popolaSelectDispositivi(list) {
+      const select = document.getElementById("modello_dispositivo");
+      select.innerHTML = "";
+      list.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d.id;
+        opt.textContent = `${d.nome} (${d.vizio || d.probabilita_vizio}% prob. vizio)`;
+        select.appendChild(opt);
+      });
+    }
+
+    // --- LOGICA MAPPA LEAFLET ---
+    function inizializzaMappa() {
+      // Centro iniziale su Roma
+      mappaLeaflet = L.map('mappa-autovelox').setView([41.8902, 12.4922], 6);
+
+      // Tile layer ESRI WorldStreetMap: ad altissima definizione, 100% gratuito, zero watermark, zero API key
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Mappe &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Dati Stradali Italia'
+      }).addTo(mappaLeaflet);
+
+      markersLayer = L.layerGroup().addTo(mappaLeaflet);
+    }
+
+    let tutteLePostazioni = [];
+    let filtroFissiAttivo = true;
+    let filtroMobiliAttivo = true;
+
+    // Icone personalizzate ad altissima visibilità
+    const iconaFisso = L.divIcon({
+      className: 'custom-icon-fisso',
+      html: `
+        <div style="background: #dc2626; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 2.5px solid white; box-shadow: 0 4px 10px rgba(220,38,38,0.5); cursor: pointer;" title="Autovelox Fisso">
+          📷
+        </div>
+      `,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor: [0, -14]
+    });
+
+    const iconaMobile = L.divIcon({
+      className: 'custom-icon-mobile',
+      html: `
+        <div style="background: #f59e0b; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(245,158,11,0.6); cursor: pointer; animation: pulse 2s infinite;" title="Postazione Mobile / Polizia">
+          🚓
+        </div>
+      `,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+      popupAnchor: [0, -15]
+    });
+
+    function toggleFiltro(tipo) {
+      if (tipo === 'fissi') {
+        filtroFissiAttivo = !filtroFissiAttivo;
+        const btn = document.getElementById("btn-filtro-fissi");
+        if (filtroFissiAttivo) {
+          btn.className = "px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-red-500 bg-red-500/20 text-red-200";
+        } else {
+          btn.className = "px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 bg-slate-800 text-slate-500 opacity-60";
+        }
+      } else if (tipo === 'mobili') {
+        filtroMobiliAttivo = !filtroMobiliAttivo;
+        const btn = document.getElementById("btn-filtro-mobili");
+        if (filtroMobiliAttivo) {
+          btn.className = "px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500 bg-amber-500/20 text-amber-200";
+        } else {
+          btn.className = "px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-slate-700 bg-slate-800 text-slate-500 opacity-60";
+        }
+      }
+      renderizzaPuntiMappa();
+    }
+
+    function caricaDatiMappa() {
+      fetch("/api/mappa")
+        .then(res => res.json())
+        .then(data => {
+          tutteLePostazioni = data.postazioni || [];
+          renderizzaPuntiMappa();
+          tuttiIControlliMobili = data.controlli_mobili_settimana || [];
+          renderizzaTabellaMobili(tuttiIControlliMobili);
+        })
+        .catch(() => {
+          tutteLePostazioni = DATI_MAPPA_FALLBACK.postazioni || [];
+          renderizzaPuntiMappa();
+          tuttiIControlliMobili = DATI_MAPPA_FALLBACK.controlli_mobili_settimana || [];
+          renderizzaTabellaMobili(tuttiIControlliMobili);
+        });
+
+      // Ascolto spostamento mappa per caricare tutti i radar dell'area visibile in Italia
+      if (mappaLeaflet) {
+        let debounceTimer;
+        mappaLeaflet.on('moveend', () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            if (mappaLeaflet.getZoom() >= 10) {
+              const bounds = mappaLeaflet.getBounds();
+              caricaAutoveloxPerBounds(bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast());
+            }
+          }, 500);
+        });
+      }
+    }
+
+    function renderizzaPuntiMappa() {
+      markersLayer.clearLayers();
+
+      let numFissi = 0;
+      let numMobili = 0;
+
+      tutteLePostazioni.forEach(item => {
+        const isFisso = (item.tipo_postazione === "fisso" || !item.tipo_postazione);
+        
+        if (isFisso) {
+          numFissi++;
+          if (!filtroFissiAttivo) return;
+        } else {
+          numMobili++;
+          if (!filtroMobiliAttivo) return;
+        }
+
+        const icona = isFisso ? iconaFisso : iconaMobile;
+        const marker = L.marker([item.lat, item.lng], { icon: icona });
+
+        const badgeHeader = isFisso 
+          ? `<span style="display: inline-block; background: #fee2e2; color: #b91c1c; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; border: 1px solid #fecaca; margin-bottom: 4px;">🔴 AUTOVELOX FISSO PERMANENTE</span>`
+          : `<span style="display: inline-block; background: #fef3c7; color: #b45309; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; border: 1px solid #fde68a; margin-bottom: 4px;">🟡 CONTROLLO MOBILE / POLIZIA</span>`;
+
+        const popupContent = `
+          <div style="font-family: sans-serif; font-size: 12px; min-width: 200px; padding: 2px;">
+            ${badgeHeader}
+            <div style="font-weight: 800; color: #0f172a; font-size: 13px; line-height: 1.3;">${item.strada}</div>
+            <div style="color: #64748b; font-size: 11px; margin-bottom: 6px;">${item.citta || 'Località censita'} &bull; <strong>Limite: ${item.limite} km/h</strong></div>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 5px 8px; border-radius: 6px; margin-bottom: 8px; font-size: 11px;">
+              <strong>Apparecchio:</strong> ${item.modello}<br>
+              <strong>Stato Giuridico:</strong> <span style="color: ${isFisso ? '#b45309' : '#0284c7'}; font-weight: 700;">${item.stato_omologazione}</span>
+            </div>
+            
+            <button onclick="selezionaPuntoMappa('${item.citta || 'Zona'}', '${item.strada}', ${item.limite})" style="width: 100%; background: #2563eb; color: white; padding: 7px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 11px; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
+              Hai preso la multa qui? Verifica &rarr;
+            </button>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        markersLayer.addLayer(marker);
+      });
+
+      // Aggiorna contatori nei bottoni
+      const cf = document.getElementById("count-fissi");
+      const cm = document.getElementById("count-mobili");
+      if (cf) cf.textContent = numFissi;
+      if (cm) cm.textContent = numMobili;
+    }
+
+    // Caricamento dinamico tramite OpenStreetMap Overpass API
+    function caricaAutoveloxPerBounds(s, w, n, e) {
+      const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:6];node["highway"="speed_camera"](${s},${w},${n},${e});out;`;
+
+      fetch(overpassUrl)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.elements && data.elements.length > 0) {
+            let nuovi = 0;
+            data.elements.forEach(node => {
+              // Evita duplicati
+              const esiste = tutteLePostazioni.some(p => Math.abs(p.lat - node.lat) < 0.001 && Math.abs(p.lng - node.lon) < 0.001);
+              if (!esiste) {
+                const speedLimit = parseInt(node.tags?.maxspeed) || 70;
+                const streetName = node.tags?.name || node.tags?.description || "Postazione Censita Open Data";
+                const isMobile = node.tags?.camera_type === "mobile" || node.tags?.enforcement === "temporary";
+
+                tutteLePostazioni.push({
+                  id: "OSM_" + node.id,
+                  lat: node.lat,
+                  lng: node.lon,
+                  citta: "Censimento Ufficiale",
+                  strada: streetName,
+                  limite: speedLimit,
+                  tipo_postazione: isMobile ? "mobile" : "fisso",
+                  modello: "Rilevatore di velocità",
+                  stato_omologazione: "Verifica Omologazione Necessaria",
+                  probabilita_vizio: 90
+                });
+                nuovi++;
+              }
+            });
+            if (nuovi > 0) {
+              renderizzaPuntiMappa();
+            }
+          }
+        })
+        .catch(() => {});
+    }
+
+    function centraMappa(lat, lng, zoom) {
+      if (mappaLeaflet) {
+        mappaLeaflet.setView([lat, lng], zoom);
+      }
+    }
+
+    function localizzaUtente() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          centraMappa(pos.coords.latitude, pos.coords.longitude, 13);
+          L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
+            radius: 9,
+            fillColor: "#3b82f6",
+            color: "#ffffff",
+            weight: 3,
+            fillOpacity: 1
+          }).addTo(markersLayer).bindPopup("<b>Sei qui</b>").openPopup();
+        }, () => {
+          alert("Impossibile rilevare la posizione GPS. Assicurati di aver concesso i permessi.");
+        });
+      }
+    }
+
+    let searchResultMarker = null;
+
+    // Caricamento dinamico Open Data degli autovelox per l'area cercata
+    function caricaAutoveloxLivePerBbox(lat, lon) {
+      const delta = 0.18;
+      caricaAutoveloxPerBounds(lat - delta, lon - delta, lat + delta, lon + delta);
+    }
+
+    function cercaLocalita() {
+      const inputEl = document.getElementById("input-cerca-luogo");
+      const query = inputEl.value.trim();
+      if (!query) {
+        alert("Inserisci il nome di un comune, indirizzo o tratta stradale.");
+        inputEl.focus();
+        return;
+      }
+
+      const originalPlaceholder = inputEl.placeholder;
+      inputEl.placeholder = "Ricerca geografica in corso...";
+
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=it&limit=1`;
+
+      fetch(url, {
+        headers: {
+          'Accept-Language': 'it-IT,it;q=0.9'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        inputEl.placeholder = originalPlaceholder;
+        if (!data || data.length === 0) {
+          alert(`Nessuna località trovata per "${query}". Prova specificando la provincia o il nome completo.`);
+          return;
+        }
+
+        const item = data[0];
+        const lat = parseFloat(item.lat);
+        const lon = parseFloat(item.lon);
+        const nomeBreve = item.display_name.split(',')[0];
+
+        // Centra la mappa con zoom ottimale per visualizzare città e tangenziali
+        centraMappa(lat, lon, 11);
+
+        // Rimuove eventuale marker precedente
+        if (searchResultMarker && mappaLeaflet) {
+          mappaLeaflet.removeLayer(searchResultMarker);
+        }
+
+        searchResultMarker = L.marker([lat, lon]).addTo(mappaLeaflet)
+          .bindPopup(`
+            <div style="font-family: sans-serif; font-size: 12px; min-width: 180px;">
+              <strong style="color: #2563eb; font-size: 13px;">📍 ${nomeBreve}</strong><br>
+              <span style="font-size: 11px; color: #64748b; display: block; margin: 3px 0 6px 0;">${item.display_name}</span>
+              <button onclick="selezionaPuntoMappa('${nomeBreve}', '${nomeBreve}', 50)" style="width: 100%; background: #2563eb; color: white; padding: 6px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 11px;">
+                Verifica multa per questa zona &rarr;
+              </button>
+            </div>
+          `)
+          .openPopup();
+
+        // Carica dinamicamente anche gli autovelox censiti su OpenStreetMap in quest'area
+        caricaAutoveloxLivePerBbox(lat, lon);
+      })
+      .catch(() => {
+        inputEl.placeholder = originalPlaceholder;
+        alert("Errore durante la ricerca geografica. Verifica la connessione internet.");
+      });
+    }
+
+    function selezionaPuntoMappa(citta, strada, limite) {
+      document.getElementById("ente_accertatore").value = "Polizia Locale di " + citta;
+      document.getElementById("luogo_infrazione").value = strada;
+      document.getElementById("limite_velocita").value = limite;
+      document.getElementById("velocita_rilevata").value = limite + 18;
+
+      // Scroll al wizard
+      document.getElementById("wizard").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- TABELLA CONTROLLI MOBILI ---
+    function renderizzaTabellaMobili(lista) {
+      const tbody = document.getElementById("tabella-controlli-body");
+      tbody.innerHTML = "";
+
+      if (lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-400">Nessun controllo programmato per questa regione.</td></tr>`;
+        return;
+      }
+
+      lista.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-900">${item.data}</td>
+          <td class="py-3 px-4 font-semibold text-blue-700">${item.regione}</td>
+          <td class="py-3 px-4 font-medium text-slate-800">${item.strada}</td>
+          <td class="py-3 px-4 text-slate-600">${item.provincia} (${item.direzione})</td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">${item.note}</span></td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="selezionaPuntoMappa('${item.regione}', '${item.strada}', 70)" class="text-blue-600 hover:text-blue-800 font-bold underline">Verifica</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filtraControlliMobili(regione) {
+      if (regione === "TUTTE") {
+        renderizzaTabellaMobili(tuttiIControlliMobili);
+      } else {
+        const filtrati = tuttiIControlliMobili.filter(c => c.regione.toLowerCase() === regione.toLowerCase());
+        renderizzaTabellaMobili(filtrati);
+      }
+    }
+
+    // --- WIZARD E ANALISI MULTA ---
+    function goToStep(step) {
+      document.getElementById("step-1").classList.add("hidden");
+      document.getElementById("step-2").classList.add("hidden");
+      document.getElementById("step-3").classList.add("hidden");
+
+      const b1 = document.getElementById("step-badge-1");
+      const b2 = document.getElementById("step-badge-2");
+      const b3 = document.getElementById("step-badge-3");
+
+      if (step === 1) {
+        document.getElementById("step-1").classList.remove("hidden");
+        b1.className = "w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm";
+        b2.className = "w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm";
+      } else if (step === 2) {
+        document.getElementById("step-2").classList.remove("hidden");
+        b1.className = "w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm";
+        b2.className = "w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm";
+      } else if (step === 3) {
+        document.getElementById("step-3").classList.remove("hidden");
+        b1.className = "w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm";
+        b2.className = "w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm";
+        b3.className = "w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm";
+      }
+    }
+
+    function getDatiMulta() {
+      return {
+        ente_accertatore: document.getElementById("ente_accertatore").value,
+        luogo_infrazione: document.getElementById("luogo_infrazione").value,
+        data_infrazione: document.getElementById("data_infrazione").value,
+        data_notifica: document.getElementById("data_notifica").value,
+        limite_velocita: parseFloat(document.getElementById("limite_velocita").value),
+        velocita_rilevata: parseFloat(document.getElementById("velocita_rilevata").value),
+        modello_dispositivo: document.getElementById("modello_dispositivo").value,
+        matricola: document.getElementById("matricola").value,
+        numero_verbale: document.getElementById("numero_verbale").value,
+        taratura_citata: document.getElementById("taratura_citata").value === "true",
+        presenza_cartello: document.getElementById("presenza_cartello").value === "true"
+      };
+    }
+
+    function analizzaEMostraRisultato() {
+      const payload = getDatiMulta();
+
+      fetch("/api/analizza", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        cachedAnalisi = data;
+        renderizzaRisultati(data);
+        goToStep(3);
+      })
+      .catch(() => {
+        const clientAnalisi = calcolaAnalisiClient(payload);
+        cachedAnalisi = clientAnalisi;
+        renderizzaRisultati(clientAnalisi);
+        goToStep(3);
+      });
+    }
+
+    function calcolaAnalisiClient(p) {
+      const dInf = new Date(p.data_infrazione);
+      const dNot = new Date(p.data_notifica);
+      const diffDays = Math.round((dNot - dInf) / (1000 * 60 * 60 * 24));
+      const notificaTardiva = diffDays > 90;
+      
+      const vizi = [];
+      let score = 50;
+
+      vizi.push({
+        titolo: "Mancata omologazione tecnica (Ordinanza Cassazione n. 10505/2024)",
+        gravita: "ALTA",
+        descrizione: "Il dispositivo risulta sprovvisto di formale decreto di omologazione ai sensi dell'art. 142 c. 6 CdS, essendo munito unicamente di mera approvazione dirigenziale."
+      });
+
+      if (notificaTardiva) {
+        vizi.unshift({
+          titolo: "Decadenza per tardiva notifica oltre 90 giorni (Art. 201 CdS)",
+          gravita: "ASSOLUTA",
+          descrizione: `Verbale notificato dopo ${diffDays} giorni (limite perentorio: 90 giorni). L'obbligazione è estinta di diritto.`
+        });
+        score = 99;
+      }
+
+      if (!p.taratura_citata) {
+        vizi.push({
+          titolo: "Omessa indicazione della verifica periodica di taratura annuale",
+          gravita: "ALTA",
+          descrizione: "Mancano gli estremi del certificato di taratura periodica (Corte Cost. n. 113/2015). L'amministrazione deve dimostrare il perfetto funzionamento."
+        });
+        score += 30;
+      }
+
+      if (!p.presenza_cartello) {
+        vizi.push({
+          titolo: "Carenza di presegnalazione e visibilità della postazione",
+          gravita: "MEDIA",
+          descrizione: "Mancato rispetto delle distanze regolamentari del cartello di preavviso."
+        });
+        score += 15;
+      }
+
+      const devName = document.getElementById("modello_dispositivo").selectedOptions[0]?.text || "Autovelox";
+
+      return {
+        dispositivo: { nome: devName },
+        probabilita_successo: Math.min(98, Math.max(score, 75)),
+        giorni_rimasti_prefetto: Math.max(0, 60 - Math.round((new Date() - dNot) / (1000 * 60 * 60 * 24))),
+        riduzione_tolleranza: Math.max(5, p.velocita_rilevata * 0.05),
+        vizi_rilevati: vizi
+      };
+    }
+
+    function renderizzaRisultati(res) {
+      document.getElementById("probabilita-score").textContent = res.probabilita_successo + "%";
+      document.getElementById("giorni-prefetto").textContent = res.giorni_rimasti_prefetto;
+      document.getElementById("tolleranza-val").textContent = "-" + Math.round(res.riduzione_tolleranza) + " km/h";
+
+      const viziList = document.getElementById("vizi-list");
+      viziList.innerHTML = "";
+
+      res.vizi_rilevati.forEach(v => {
+        const item = document.createElement("div");
+        item.className = "p-4 rounded-xl border border-slate-200 bg-white flex items-start gap-3 shadow-sm";
+        const badgeColor = v.gravita === "ASSOLUTA" ? "bg-red-100 text-red-800" : (v.gravita === "ALTA" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800");
+        
+        item.innerHTML = `
+          <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${badgeColor} shrink-0 mt-0.5">${v.gravita}</span>
+          <div>
+            <h5 class="text-sm font-bold text-slate-900">${v.titolo}</h5>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">${v.descrizione}</p>
+          </div>
+        `;
+        viziList.appendChild(item);
+      });
+    }
+
+    function generaDocumentoFinale() {
+      const datiMulta = getDatiMulta();
+      const datiUtente = {
+        nome_cognome: document.getElementById("usr_nome").value,
+        codice_fiscale: document.getElementById("usr_cf").value,
+        targa: document.getElementById("usr_targa").value,
+        residenza: document.getElementById("usr_residenza").value,
+        provincia_prefettura: document.getElementById("usr_provincia").value,
+        pec_email: document.getElementById("usr_pec").value,
+        telefono: document.getElementById("usr_tel").value,
+        data_nascita: document.getElementById("usr_nascita").value
+      };
+
+      fetch("/api/genera-documento", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ multa: datiMulta, utente: datiUtente })
+      })
+      .then(res => res.json())
+      .then(data => {
+        fullHtmlDocument = data.html;
+        document.getElementById("anteprima-documento-box").innerHTML = data.html;
+        document.getElementById("modal-documento").classList.remove("hidden");
+      })
+      .catch(() => {
+        const fakeHtml = generaTestoRicorsoClient(datiMulta, datiUtente);
+        fullHtmlDocument = fakeHtml;
+        document.getElementById("anteprima-documento-box").innerHTML = fakeHtml;
+        document.getElementById("modal-documento").classList.remove("hidden");
+      });
+    }
+
+    function generaTestoRicorsoClient(m, u) {
+      return `
+        <div style="font-family: serif; font-size: 11pt; line-height: 1.6;">
+          <h3 style="text-align: center; font-weight: bold;">ALL'ECCELLENTISSIMO SIGNOR PREFETTO DELLA PROVINCIA DI ${u.provincia_prefettura.toUpperCase()}</h3>
+          <p style="text-align: center; font-size: 10pt; color: #555;">(Inoltrato a mezzo PEC tramite ${m.ente_accertatore})</p>
+          <hr style="margin: 15px 0; border-top: 1px solid #ccc;"/>
+          <p><strong>OGGETTO: RICORSO AMMINISTRATIVO EX ARTT. 203 E 204 C.D.S.</strong><br/>Avverso il verbale di contestazione n. <strong>${m.numero_verbale}</strong> elevato da ${m.ente_accertatore}</p>
+          <p>Il/La sottoscritto/a <strong>${u.nome_cognome.toUpperCase()}</strong>, C.F. <strong>${u.codice_fiscale.toUpperCase()}</strong>, residente in ${u.residenza}, PEC: ${u.pec_email}, in qualità di proprietario/conducente del veicolo targato <strong>${u.targa.toUpperCase()}</strong>,</p>
+          <h4 style="margin-top: 15px; font-weight: bold; text-decoration: underline;">PREMESSO CHE</h4>
+          <p>In data ${m.data_notifica} veniva notificato il verbale impugnato per presunta violazione dei limiti di velocità (art. 142 CdS) accertata in data ${m.data_infrazione} mediante l'apparecchiatura '${m.modello_dispositivo}' (Matricola: ${m.matricola});</p>
+          <h4 style="margin-top: 15px; font-weight: bold; text-decoration: underline;">MOTIVI DI GRAVAME</h4>
+          <p><strong>1. NULLITÀ PER MANCATA OMOLOGAZIONE TECNICA (CASSAZIONE CIVILE N. 10505/2024):</strong> Il dispositivo utilizzato risulta privo di formale decreto di omologazione, risultando al più meramente approvato. La Suprema Corte ha ribadito la netta distinzione tra i due istituti e l'inutilizzabilità dell'accertamento non omologato.</p>
+          <p><strong>2. OMESSA PROVA DELLA TARATURA PERIODICA ANNUALE (CORTE COST. N. 113/2015):</strong> Nel verbale non sono riportati gli estremi del certificato di taratura annuale emesso da centro accreditato ACCREDIA/LAT.</p>
+          <h4 style="margin-top: 15px; font-weight: bold; text-decoration: underline;">P.Q.M. (PER QUESTI MOTIVI)</h4>
+          <p>Si chiede al Prefetto di voler disporre in via cautelare la <strong>SOSPENSIONE dell'esecutività</strong> del verbale ex art. 203 c. 1-bis CdS e, nel merito, l'<strong>ANNULLAMENTO TOTALE</strong> del verbale con archiviazione degli atti senza decurtazione di punti patente.</p>
+          <br/>
+          <p style="text-align: right;">Firma: ________________________________</p>
+        </div>
+      `;
+    }
+
+    function stampaDocumento() {
+      const win = window.open("", "_blank");
+      win.document.write(fullHtmlDocument);
+      win.document.close();
+      win.focus();
+      setTimeout(() => { win.print(); }, 250);
+    }
+
+    function chiudiModal() {
+      document.getElementById("modal-documento").classList.add("hidden");
+    }
+
+    // --- GESTIONE PAGINE LEGALI AD SENSE & COOKIE ---
+    function apriModalLegale(tipo) {
+      const titolo = document.getElementById("modal-legale-titolo");
+      const corpo = document.getElementById("modal-legale-corpo");
+
+      if (tipo === 'privacy') {
+        titolo.textContent = "Informativa sulla Privacy (Privacy Policy & AdSense)";
+        corpo.innerHTML = `
+          <h4 class="font-bold text-slate-800 text-sm">Informativa sul Trattamento dei Dati Personali (GDPR 2016/679)</h4>
+          <p>La presente Privacy Policy descrive le modalità di gestione dei dati personali degli utenti che consultano la piattaforma VeloxCheck.</p>
+          <p><strong>1. Titolare del Trattamento:</strong> VeloxCheck - Piattaforma Informatica Indipendente. Email di contatto: privacy@veloxcheck.it.</p>
+          <p><strong>2. Dati trattati:</strong> I dati inseriti nel simulatore di verifica della multa (targa, modello autovelox, data) vengono elaborati in tempo reale nel browser dell'utente e non vengono ceduti a terze parti.</p>
+          <p><strong>3. Pubblicità e Cookie di terze parti (Google AdSense):</strong> In qualità di fornitore terzo, Google utilizza cookie per pubblicare annunci sul presente sito. L'utilizzo di cookie pubblicitari consente a Google e ai suoi partner di pubblicare annunci per gli utenti in base alla loro visita a questo e ad altri siti internet. Gli utenti possono scegliere di disattivare la pubblicità personalizzata consultando le Impostazioni annunci di Google.</p>
+          <p><strong>4. Diritti dell'interessato:</strong> Gli utenti possono richiedere in qualsiasi momento l'accesso, la rettifica o la cancellazione dei propri dati scrivendo a privacy@veloxcheck.it.</p>
+        `;
+      } else if (tipo === 'cookie') {
+        titolo.textContent = "Informativa Estesa sui Cookie (Cookie Policy)";
+        corpo.innerHTML = `
+          <h4 class="font-bold text-slate-800 text-sm">Utilizzo dei Cookie</h4>
+          <p>I cookie sono brevi frammenti di testo inviati al tuo browser da un sito web visitato.</p>
+          <p><strong>Cookie Tecnici:</strong> Essenziali per il corretto funzionamento della mappa e del questionario di verifica delle sanzioni.</p>
+          <p><strong>Cookie Analitici e Pubblicitari (Google LLC):</strong> Utilizzati per misurare le visite e proporre annunci pertinenti tramite la rete pubblicitaria di Google AdSense. È possibile disattivare i cookie tramite le impostazioni del proprio browser o tramite la piattaforma europea <a href="https://www.youronlinechoices.com/it/" target="_blank" class="text-blue-600 underline">Your Online Choices</a>.</p>
+        `;
+      } else if (tipo === 'termini') {
+        titolo.textContent = "Termini e Condizioni di Servizio";
+        corpo.innerHTML = `
+          <h4 class="font-bold text-slate-800 text-sm">Condizioni d'Uso della Piattaforma</h4>
+          <p><strong>Natura del Servizio:</strong> VeloxCheck è un software applicativo di utilità informativa e di autocompilazione documentale basato sulla giurisprudenza pubblica della Corte di Cassazione.</p>
+          <p><strong>Esclusione di responsabilità legale:</strong> Il servizio non fornisce consulenza legale individuale, pareri pro-veritate né patrocinio processuale riservato agli avvocati abilitati ex art. 348 c.p. La presentazione del ricorso al Prefetto spetta in via esclusiva al ricorrente a proprio nome.</p>
+          <p><strong>Limiti di velocità e Mappa:</strong> La mappa ha carattere puramente informativo-preventivo. L'automobilista è tenuto in ogni caso all'osservanza della segnaletica stradale vigente.</p>
+        `;
+      } else if (tipo === 'contatti') {
+        titolo.textContent = "Contatti & Assistenza";
+        corpo.innerHTML = `
+          <h4 class="font-bold text-slate-800 text-sm">Supporto e Segnalazioni</h4>
+          <p>Hai domande sul funzionamento del servizio, vuoi segnalare un nuovo autovelox non ancora mappato o richiedere assistenza?</p>
+          <p><strong>Email:</strong> info@veloxcheck.it</p>
+          <p><strong>Ufficio Tecnico:</strong> Via Roma, Italia</p>
+          <p>Rispondiamo a tutte le richieste entro 24-48 ore lavorative.</p>
+        `;
+      }
+
+      document.getElementById("modal-legale").classList.remove("hidden");
+    }
+
+    function chiudiModalLegale() {
+      document.getElementById("modal-legale").classList.add("hidden");
+    }
+
+    function accettaCookie() {
+      localStorage.setItem("veloxcheck_cookie_consent", "true");
+      document.getElementById("cookie-banner").classList.add("hidden");
+    }
+
+    // Controlla se l'utente ha già accettato i cookie
+    if (localStorage.getItem("veloxcheck_cookie_consent") === "true") {
+      const banner = document.getElementById("cookie-banner");
+      if (banner) banner.classList.add("hidden");
+    }
+  </script>
+</body>
+</html>

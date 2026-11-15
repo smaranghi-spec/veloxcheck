@@ -1,0 +1,12 @@
+[2026-11-15 11:32:26] ==================================================
+[2026-11-15 11:32:26] 🤖 AVVIO AGENTE DI AGGIORNAMENTO VELOXCHECK
+[2026-11-15 11:32:26] ==================================================
+[2026-11-15 11:32:26] 📡 Interrogazione Overpass API per autovelox in Italia...
+[2026-11-15 11:32:26] ⚠️ Nota: Impossibile completare query Overpass in questo momento (<urlopen error [Errno 11001] getaddrinfo failed>). I dati locali rimangono attivi.
+[2026-11-15 11:32:26] 🚔 Aggiornamento calendario controlli mobili Polizia Stradale...
+[2026-11-15 11:32:26] 💾 File C:\Users\smara\Documents\Progetti Antigravity\Entrata automatica mensile\scripts\..\data\autovelox_mappa.json aggiornato con successo.
+[2026-11-15 11:32:26]  Riepilogo: 46 autovelox censiti (0 nuovi aggiunti)
+[2026-11-15 11:32:26]  Riepilogo: 14 controlli mobili programmati per la settimana
+[2026-11-15 11:32:26] ==================================================
+[2026-11-15 11:32:26] ✅ AGGIORNAMENTO COMPLETATO CON SUCCESSO
+[2026-11-15 11:32:26] ==================================================
