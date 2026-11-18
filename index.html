@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VeloxCheck — Verifica Conformità Autovelox, Ricorsi & Mappa Live Italia</title>
+  <meta name="description" content="Verifica gratis la conformità del tuo verbale autovelox con la sentenza Cassazione 10505/2024. Mappa live di tutti gli autovelox fissi e postazioni mobili in Italia e generatore di ricorso al Prefetto.">
+  <meta name="keywords" content="autovelox italia, ricorso autovelox, cassazione 10505 2024, autovelox fissi, autovelox mobili, omologazione autovelox, mappa autovelox live, annullare multa autovelox">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Facebook / WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="VeloxCheck — Mappa Autovelox Italia & Verifica Multe Cassazione 2024">
+  <meta property="og:description" content="Mappa interattiva aggiornata di tutti gli autovelox fissi e pattuglie mobili in Italia. Calcola gratis se la tua contravvenzione è nulla ex Cass. 10505/2024.">
+  <meta property="og:locale" content="it_IT">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VeloxCheck — Mappa Autovelox Italia & Verifica Ricorsi">
+  <meta name="twitter:description" content="Mappa autovelox fissi e mobili in Italia con verifica di omologazione e ricorso gratuito.">
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Leaflet CSS & JS per la Mappa Interattiva (OpenStreetMap) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -30,6 +44,36 @@
       "price": "0.00",
       "priceCurrency": "EUR"
     }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Le multe per autovelox solo approvato sono nulle?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sì, l'ordinanza della Corte di Cassazione n. 10505/2024 ha stabilito la netta distinzione tra approvazione e omologazione: solo gli apparecchi regolarmente omologati possono legittimamente accertare la velocità."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Entro quanti giorni si può fare ricorso al Prefetto per autovelox?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Il ricorso al Prefetto ai sensi dell'Art. 203 del Codice della Strada deve essere presentato entro 60 giorni dalla data di notifica del verbale, a mezzo raccomandata A/R o PEC."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Come riconoscere se un autovelox è fisso o mobile sulla mappa?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sulla mappa di VeloxCheck gli autovelox fissi sono contrassegnati con l'icona della fotocamera rossa, mentre le postazioni mobili della Polizia Stradale sono evidenziate con l'icona della volante della polizia."
+        }
+      }
+    ]
   }
   </script>
   <style>
@@ -38,6 +82,12 @@
     #mappa-autovelox { z-index: 10; }
     .leaflet-popup-content-wrapper { border-radius: 12px; padding: 4px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); }
   </style>
+
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
 
